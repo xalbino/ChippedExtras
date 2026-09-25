@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/chippedexttras.main.iml" filepath="$PROJECT_DIR$/.idea/modules/chippedexttras.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/chippedexttras.test.iml" filepath="$PROJECT_DIR$/.idea/modules/chippedexttras.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ChippedExtras.main.iml" filepath="$PROJECT_DIR$/.idea/modules/ChippedExtras.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ChippedExtras.test.iml" filepath="$PROJECT_DIR$/.idea/modules/ChippedExtras.test.iml" />
     </modules>
   </component>
 </project>
