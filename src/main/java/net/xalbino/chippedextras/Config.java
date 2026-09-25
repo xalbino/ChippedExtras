@@ -1,4 +1,4 @@
-package me.puredoom.chippedexttras;
+package net.xalbino.chippedextras;
 
 import net.minecraftforge.common.ForgeConfigSpec;
 

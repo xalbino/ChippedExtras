@@ -1,27 +1,27 @@
-package me.puredoom.chippedexttras.datagen;
+package net.xalbino.chippedextras.datagen;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import me.puredoom.chippedexttras.Chippedexttras;
-import net.minecraft.data.CachedOutput;
+import net.xalbino.chippedextras.ChippedExtras;
+import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
-import net.minecraft.data.PackOutput;
+import net.minecraft.data.HashCache;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.data.ExistingFileHelper;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 
 public class VariantModelStateProvider implements DataProvider {
-    private static final Gson GSON = new GsonBuilder().disableHtmlEscaping().create();
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
-    private final PackOutput output;
+    private final DataGenerator generator;
     @SuppressWarnings("unused")
     private final ExistingFileHelper efh;
     private final ChippedDiscoveryProvider discover;
@@ -30,64 +30,77 @@ public class VariantModelStateProvider implements DataProvider {
     private static final Map<String, JsonObject> MODEL_JSON_CACHE = new HashMap<>();
     private static final Set<String> MISSING_RES = new HashSet<>();
 
-    public VariantModelStateProvider(PackOutput out, ExistingFileHelper efh, ChippedDiscoveryProvider d) {
-        this.output = out;
+    public VariantModelStateProvider(DataGenerator generator, ExistingFileHelper efh, ChippedDiscoveryProvider d) {
+        this.generator = generator;
         this.efh = efh;
         this.discover = d;
     }
 
     @Override
-    public CompletableFuture<?> run(CachedOutput cache) {
-        List<CompletableFuture<?>> futures = new ArrayList<>();
-
+    public void run(HashCache cache) throws IOException {
         for (var e : discover.discovered()) {
+            if (e == null || e.base() == null) continue;
+
             ResourceLocation baseRL = ResourceLocation.tryParse(e.base());
+            if (baseRL == null) continue;
+
             String resolvedTex = resolveBestTexture(baseRL);
 
-            {
+            // 1. Slab Generation
+            if (e.slab() != null) {
                 String name = rlPath(e.slab());
-                futures.add(saveModel(cache, name, slabModel(resolvedTex)));
-                futures.add(saveModel(cache, name + "_top", slabTopModel(resolvedTex)));
-                futures.add(saveModel(cache, name + "_double", cubeAllModel(resolvedTex)));
-                futures.add(saveItemModel(cache, name, itemParent(modBlock(name))));
-                futures.add(saveBlockstate(cache, name, slabBlockstate(
-                        modBlock(name),
-                        modBlock(name + "_top"),
-                        modBlock(name + "_double")
-                )));
+                if (name != null) {
+                    saveModel(cache, name, slabModel(resolvedTex));
+                    saveModel(cache, name + "_top", slabTopModel(resolvedTex));
+                    saveModel(cache, name + "_double", cubeAllModel(resolvedTex));
+                    saveItemModel(cache, name, itemParent(modBlock(name)));
+                    saveBlockstate(cache, name, slabBlockstate(
+                            modBlock(name),
+                            modBlock(name + "_top"),
+                            modBlock(name + "_double")
+                    ));
+                }
             }
 
-            {
+            // 2. Stairs Generation
+            if (e.stairs() != null) {
                 String name = rlPath(e.stairs());
-                futures.add(saveModel(cache, name, stairsModel(resolvedTex)));
-                futures.add(saveModel(cache, name + "_inner", stairsInnerModel(resolvedTex)));
-                futures.add(saveModel(cache, name + "_outer", stairsOuterModel(resolvedTex)));
-                futures.add(saveItemModel(cache, name, itemParent(modBlock(name))));
-                futures.add(saveBlockstate(cache, name, stairsBlockstate(
-                        modBlock(name),
-                        modBlock(name + "_inner"),
-                        modBlock(name + "_outer")
-                )));
+                if (name != null) {
+                    saveModel(cache, name, stairsModel(resolvedTex));
+                    saveModel(cache, name + "_inner", stairsInnerModel(resolvedTex));
+                    saveModel(cache, name + "_outer", stairsOuterModel(resolvedTex));
+                    saveItemModel(cache, name, itemParent(modBlock(name)));
+                    saveBlockstate(cache, name, stairsBlockstate(
+                            modBlock(name),
+                            modBlock(name + "_inner"),
+                            modBlock(name + "_outer")
+                    ));
+                }
             }
 
-            {
+            // 3. Wall Generation
+            if (e.wall() != null) {
                 String name = rlPath(e.wall());
-                futures.add(saveModel(cache, name + "_post",      wallPostModel(resolvedTex)));
-                futures.add(saveModel(cache, name + "_side",      wallSideModel(resolvedTex)));
-                futures.add(saveModel(cache, name + "_side_tall", wallSideTallModel(resolvedTex)));
-                futures.add(saveModel(cache, name + "_inventory", wallInventoryModel(resolvedTex)));
-                futures.add(saveItemModel(cache, name, itemParent(modBlock(name + "_inventory"))));
-                futures.add(saveBlockstate(cache, name, wallBlockstate(
-                        modBlock(name + "_post"),
-                        modBlock(name + "_side"),
-                        modBlock(name + "_side_tall")
-                )));
+                if (name != null) {
+                    saveModel(cache, name + "_post",      wallPostModel(resolvedTex));
+                    saveModel(cache, name + "_side",      wallSideModel(resolvedTex));
+                    saveModel(cache, name + "_side_tall", wallSideTallModel(resolvedTex));
+                    saveModel(cache, name + "_inventory", wallInventoryModel(resolvedTex));
+                    saveItemModel(cache, name, itemParent(modBlock(name + "_inventory")));
+                    saveBlockstate(cache, name, wallBlockstate(
+                            modBlock(name + "_post"),
+                            modBlock(name + "_side"),
+                            modBlock(name + "_side_tall")
+                    ));
+                }
             }
         }
-        return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
     }
 
-    @Override public String getName() { return "ChippedExttras Models & Blockstates (optimized)"; }
+    @Override
+    public String getName() {
+        return "ChippedExtras Models & Blockstates (optimized)";
+    }
 
     private static String resolveBestTexture(ResourceLocation baseBlock) {
         if (baseBlock == null) return "minecraft:block/stone";
@@ -143,6 +156,7 @@ public class VariantModelStateProvider implements DataProvider {
         if (!ok) MISSING_RES.add(path);
         return ok;
     }
+
     private static JsonObject readJsonCached(String path) {
         JsonObject cached = MODEL_JSON_CACHE.get(path);
         if (cached != null) return cached;
@@ -156,20 +170,28 @@ public class VariantModelStateProvider implements DataProvider {
         } catch (Exception ignored) { return null; }
     }
 
-    private CompletableFuture<?> saveModel(CachedOutput cache, String name, Map<String, Object> json) {
-        Path p = output.getOutputFolder().resolve("assets/" + Chippedexttras.MODID + "/models/block/" + name + ".json");
-        return DataProvider.saveStable(cache, GSON.toJsonTree(json), p);
+    private void saveModel(HashCache cache, String name, Map<String, Object> json) throws IOException {
+        Path p = generator.getOutputFolder().resolve("assets/" + ChippedExtras.MODID + "/models/block/" + name + ".json");
+        DataProvider.save(GSON, cache, GSON.toJsonTree(json), p);
     }
-    private CompletableFuture<?> saveItemModel(CachedOutput cache, String name, Map<String, Object> json) {
-        Path p = output.getOutputFolder().resolve("assets/" + Chippedexttras.MODID + "/models/item/" + name + ".json");
-        return DataProvider.saveStable(cache, GSON.toJsonTree(json), p);
+
+    private void saveItemModel(HashCache cache, String name, Map<String, Object> json) throws IOException {
+        Path p = generator.getOutputFolder().resolve("assets/" + ChippedExtras.MODID + "/models/item/" + name + ".json");
+        DataProvider.save(GSON, cache, GSON.toJsonTree(json), p);
     }
-    private CompletableFuture<?> saveBlockstate(CachedOutput cache, String name, Map<String, Object> json) {
-        Path p = output.getOutputFolder().resolve("assets/" + Chippedexttras.MODID + "/blockstates/" + name + ".json");
-        return DataProvider.saveStable(cache, GSON.toJsonTree(json), p);
+
+    private void saveBlockstate(HashCache cache, String name, Map<String, Object> json) throws IOException {
+        Path p = generator.getOutputFolder().resolve("assets/" + ChippedExtras.MODID + "/blockstates/" + name + ".json");
+        DataProvider.save(GSON, cache, GSON.toJsonTree(json), p);
     }
-    private static String rlPath(String rl) { return ResourceLocation.tryParse(rl).getPath(); }
-    private static String modBlock(String name) { return Chippedexttras.MODID + ":block/" + name; }
+
+    private static String rlPath(String rl) {
+        if (rl == null) return null;
+        ResourceLocation loc = ResourceLocation.tryParse(rl);
+        return loc != null ? loc.getPath() : null;
+    }
+
+    private static String modBlock(String name) { return ChippedExtras.MODID + ":block/" + name; }
 
     private static Map<String, Object> itemParent(String parent) { return map("parent", parent); }
     private static Map<String, Object> cubeAllModel(String tex) {
@@ -191,7 +213,6 @@ public class VariantModelStateProvider implements DataProvider {
         return map("parent","minecraft:block/outer_stairs","textures",map("bottom",tex,"top",tex,"side",tex,"particle",tex));
     }
 
-    // In-world templates for walls
     private static Map<String, Object> wallPostModel(String tex) {
         return map("parent","minecraft:block/template_wall_post","textures",map("wall",tex,"particle",tex));
     }
@@ -205,7 +226,6 @@ public class VariantModelStateProvider implements DataProvider {
         return map("parent","minecraft:block/wall_inventory","textures",map("wall",tex,"particle",tex));
     }
 
-    /* ------------------------- blockstate builders ------------------------- */
     private static Map<String, Object> slabBlockstate(String modelBottom, String modelTop, String modelDouble) {
         Map<String, Object> variants = new LinkedHashMap<>();
         variants.put("type=bottom", map("model", modelBottom));
@@ -213,7 +233,6 @@ public class VariantModelStateProvider implements DataProvider {
         variants.put("type=double", map("model", modelDouble));
         return map("variants", variants);
     }
-
 
     private static Map<String, Object> stairsBlockstate(String model, String modelInner, String modelOuter) {
         Map<String, Object> variants = new LinkedHashMap<>();
@@ -234,7 +253,7 @@ public class VariantModelStateProvider implements DataProvider {
             int y = baseY.get(facing);
             if ("bottom".equals(half)) {
                 if (shape.endsWith("left"))  y = (y + 270) % 360;
-            } else { // top
+            } else {
                 if (shape.endsWith("right")) y = (y + 90) % 360;
             }
             int x = "top".equals(half) ? 180 : 0;

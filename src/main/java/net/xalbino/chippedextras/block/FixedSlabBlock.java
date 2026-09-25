@@ -1,4 +1,4 @@
-package me.puredoom.chippedexttras.block;
+package net.xalbino.chippedextras.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
