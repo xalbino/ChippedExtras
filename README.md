@@ -1,4 +1,4 @@
-# ChippedExtras
+# Chipped Plus
 
 ![Minecraft Version](https://img.shields.io/badge/Minecraft-1.18.2-brightgreen?logo=minecraft&logoColor=white)
 ![Build Status](https://img.shields.io/badge/Build-Gradle-blue?logo=gradle&logoColor=white)
@@ -6,7 +6,7 @@
 
 > **Expand your building capabilities with missing block variants for Chipped!**
 
-**ChippedExtras** is an unofficial add-on for the popular **Chipped Mod**. It bridges the gap for builders by introducing essential structural variants. Such as **walls, slabs, and stairs** for block textures that were previously missing them.
+**Chipped Plus** is an unofficial add-on for the popular **Chipped Mod**. It bridges the gap for builders by introducing essential structural variants, such as **walls, slabs, and stairs** for block textures that were previously missing them.
 
 This repository serves as a dedicated backport and maintenance project to retain full playability and accessibility for **Minecraft 1.18.2**.
 
@@ -45,7 +45,7 @@ Follow these steps to set up the development environment and compile the project
 3. **Locate the Output:**
    The compiled JAR file will be available in the output directory:
    ```text
-   build/libs/ChippedExtras-1.18.2-*.jar
+   build/libs/ChippedPlus-1.18.2-*.jar
    ```
 
 ---
@@ -55,12 +55,12 @@ Follow these steps to set up the development environment and compile the project
 This project is an unofficial backport maintained under open-source licenses.
 
 * **License:** Distributed under the [Eclipse Public License - v 2.0](LICENSE).
-* **Source Repository:** Hosted on [GitHub](https://github.com/xalbino/ChippedExtras/).
+* **Source Repository:** Hosted on [GitHub](https://github.com/xalbino/ChippedPlus/).
 * **Original Author:** [puredoom](https://github.com/puredoom) — Creator of the original *Chipped Extras* mod.
 * **Base Mod Credits:** [Chipped](https://www.curseforge.com/minecraft/mc-mods/chipped) created by the **Terrarium Team**. All referenced textures and core assets remain the property of their respective creators under the *Terrarium License v1*.
 
 ---
 
-<p center>
+<p align="center">
   <i>Not an official Minecraft product. Not approved by or associated with Mojang or Microsoft.</i>
 </p>
