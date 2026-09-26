@@ -51,8 +51,27 @@ public class ChippedDiscoveryProvider implements DataProvider {
     public void run(HashCache cache) throws IOException {
         entries.clear();
 
+        // --- TEMP DIAGNOSTIC: how many chipped: blocks actually have a registered Item? ---
+        int totalChippedBlocks = 0;
+        int chippedBlocksWithItem = 0;
+        for (ResourceLocation dbg : ForgeRegistries.BLOCKS.getKeys()) {
+            if (!"chipped".equals(dbg.getNamespace())) continue;
+            totalChippedBlocks++;
+            if (ForgeRegistries.ITEMS.getValue(dbg) != null) chippedBlocksWithItem++;
+        }
+        System.out.println("[" + ChippedExtras.MODID + "] DIAGNOSTIC: " + totalChippedBlocks
+                + " total chipped: blocks, " + chippedBlocksWithItem + " of them have a registered Item");
+        // --- END TEMP DIAGNOSTIC ---
+
         ForgeRegistries.BLOCKS.getKeys().forEach(rl -> {
             if (!"chipped".equals(rl.getNamespace())) return;
+
+            // Chipped registers a lot of connected-texture (CTM) block-state variants
+            // that were never meant to be obtainable on their own (e.g. acacia_planks_1
+            // through acacia_planks_41) — only the "canonical" variant of each material
+            // gets a real BlockItem and a real name from Chipped. Skip anything that
+            // doesn't have an item: it's an internal render variant, not a real material.
+            if (ForgeRegistries.ITEMS.getValue(rl) == null) return;
 
             final String path = rl.getPath().toLowerCase(Locale.ROOT);
 
@@ -64,13 +83,13 @@ public class ChippedDiscoveryProvider implements DataProvider {
 
             if (!isBrickStoneOrTile(tokens)) return;
 
-            final String base   = rl.toString();
-            final String slab   = new ResourceLocation(ChippedExtras.MODID, path + "_slab").toString();
+            final String base = rl.toString();
+            final String slab = new ResourceLocation(ChippedExtras.MODID, path + "_slab").toString();
             final String stairs = new ResourceLocation(ChippedExtras.MODID, path + "_stairs").toString();
 
             // Wall filter for certain blocks
             final boolean allowWall = !containsAny(tokens, Set.of("planks", "plank", "prismarine"));
-            final String wall   = allowWall ? new ResourceLocation(ChippedExtras.MODID, path + "_wall").toString() : null;
+            final String wall = allowWall ? new ResourceLocation(ChippedExtras.MODID, path + "_wall").toString() : null;
 
             entries.add(new Entry(base, slab, stairs, wall));
         });

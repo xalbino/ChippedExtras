@@ -1,6 +1,7 @@
 package net.xalbino.chippedextras;
 
 import com.mojang.logging.LogUtils;
+import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -12,53 +13,90 @@ import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import org.slf4j.Logger;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-
 @Mod(ChippedExtras.MODID)
 public class ChippedExtras {
     public static final String MODID = "chippedextras";
-    private static final Logger LOGGER = LogUtils.getLogger();
 
-    public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
-    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
+    private static final Logger LOGGER =
+            LogUtils.getLogger();
 
-    /** Creative tab: chippedextras_tab */
-    public static final CreativeModeTab CHIPPEDEXTRAS_TAB = new CreativeModeTab("chippedextras") {
-        @Override
-        public ItemStack makeIcon() {
-            if (GeneratedRegistry.VARIANT_ITEMS.size() > 4) {
-                return new ItemStack(GeneratedRegistry.VARIANT_ITEMS.get(4).get());
-            } else if (!GeneratedRegistry.VARIANT_ITEMS.isEmpty()) {
-                return new ItemStack(GeneratedRegistry.VARIANT_ITEMS.get(0).get());
-            }
-            return new ItemStack(Items.STONE);
-        }
-    };
+    public static final DeferredRegister<Block> BLOCKS =
+            DeferredRegister.create(
+                    ForgeRegistries.BLOCKS,
+                    MODID
+            );
 
-  //  public static final RegistryObject<Item> MY_ITEM = ITEMS.register("my_item", () -> new Item(new Item.Properties().tab(ChippedExtras.CHIPPEDEXTRAS_TAB)));
+    public static final DeferredRegister<Item> ITEMS =
+            DeferredRegister.create(
+                    ForgeRegistries.ITEMS,
+                    MODID
+            );
+
+    public static final CreativeModeTab CHIPPEDEXTRAS_TAB =
+            new CreativeModeTab("chippedextras") {
+
+                @Override
+                public void fillItemList(
+                        NonNullList<ItemStack> items
+                ) {
+                    items.clear();
+
+                    for (RegistryObject<Item> item : GeneratedRegistry.VARIANT_ITEMS) {
+                        items.add(new ItemStack(item.get()));
+                    }
+                }
+
+                @Override
+                public ItemStack makeIcon() {
+                    if (GeneratedRegistry.VARIANT_ITEMS.size() > 4) {
+                        return new ItemStack(
+                                GeneratedRegistry.VARIANT_ITEMS
+                                        .get(4)
+                                        .get()
+                        );
+                    }
+
+                    if (!GeneratedRegistry.VARIANT_ITEMS.isEmpty()) {
+                        return new ItemStack(
+                                GeneratedRegistry.VARIANT_ITEMS
+                                        .get(0)
+                                        .get()
+                        );
+                    }
+
+                    return new ItemStack(Items.STONE);
+                }
+            };
 
     public ChippedExtras() {
-        IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
+        IEventBus modBus =
+                FMLJavaModLoadingContext
+                        .get()
+                        .getModEventBus();
 
-        boolean isDataGen = Boolean.getBoolean("chippedextras.datagen");
+        boolean isDataGen =
+                Boolean.getBoolean("chippedextras.datagen");
+
         if (!isDataGen) {
-            GeneratedRegistry.bootstrapFromJson(BLOCKS, ITEMS);
+            GeneratedRegistry.bootstrapFromJson(
+                    BLOCKS,
+                    ITEMS
+            );
         } else {
-            LOGGER.info("[chippedextras] Datagen run detected: skipping runtime bootstrapFromJson()");
+            LOGGER.info(
+                    "[chippedextras] Datagen run detected: "
+                            + "skipping runtime bootstrapFromJson()"
+            );
         }
 
         BLOCKS.register(modBus);
@@ -67,18 +105,37 @@ public class ChippedExtras {
         modBus.addListener(this::commonSetup);
 
         MinecraftForge.EVENT_BUS.register(this);
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+
+        ModLoadingContext.get().registerConfig(
+                ModConfig.Type.COMMON,
+                Config.SPEC
+        );
     }
 
-    private void commonSetup(final FMLCommonSetupEvent event) {
+    private void commonSetup(
+            final FMLCommonSetupEvent event
+    ) {
     }
 
-    @SubscribeEvent public void onServerStarting(ServerStartingEvent e) {
-        LOGGER.info("HELLO from server starting");
+    @SubscribeEvent
+    public void onServerStarting(
+            ServerStartingEvent event
+    ) {
+        LOGGER.info(
+                "[chippedextras] Server starting"
+        );
     }
-
-    @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+    @Mod.EventBusSubscriber(
+            modid = MODID,
+            bus = Mod.EventBusSubscriber.Bus.MOD,
+            value = Dist.CLIENT
+    )
     public static class ClientModEvents {
-        @SubscribeEvent public static void onClientSetup(FMLClientSetupEvent e) { }
+
+        @SubscribeEvent
+        public static void onClientSetup(
+                FMLClientSetupEvent event
+        ) {
+        }
     }
 }
