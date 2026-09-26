@@ -1,29 +1,66 @@
 # ChippedExtras
 
-Welcome to the **ChippedExtras** developer repository!
+![Minecraft Version](https://img.shields.io/badge/Minecraft-1.18.2-brightgreen?logo=minecraft&logoColor=white)
+![Build Status](https://img.shields.io/badge/Build-Gradle-blue?logo=gradle&logoColor=white)
+![License](https://img.shields.io/badge/License-EPL--2.0-orange.svg)
 
-This project seeks to retain playability and access to ChippedExtras for common modded versions, starting with Minecraft 1.18.2.
+> **Expand your building capabilities with missing block variants for Chipped!**
+
+**ChippedExtras** is an unofficial add-on for the popular **Chipped Mod**. It bridges the gap for builders by introducing essential structural variants. Such as **walls, slabs, and stairs** for block textures that were previously missing them.
+
+This repository serves as a dedicated backport and maintenance project to retain full playability and accessibility for **Minecraft 1.18.2**.
 
 ---
 
-## Compilation & Setup
+## ✨ Features
 
-To compile the workspace, always run the DataGen pipeline first to generate all necessary block models, recipes, and blockstates:
+- 🧱 **Complete Variant Coverage:** Adds matching walls, slabs, and stairs for Chipped block designs.
+- 🎨 **Seamless Integration:** Fully compatible with base Chipped palettes and recipes.
+- 🔄 **1.18.2 Backport:** Specifically tuned and maintained for Minecraft 1.18.2 modpacks.
 
-```bash
-./gradlew runData
-```
+---
 
-After the DataGen process completes, you can build the Mod JAR:
-```bash
-./gradlew build
-```
+## 🛠️ Developer Setup & Compilation
 
-## License & Credits
+Follow these steps to set up the development environment and compile the project from source:
 
-This mod is an unofficial 1.18.2 backport of **Chipped Extras**.
+### Prerequisites
+* **Java Development Kit (JDK):** Version 17
+* **Gradle Wrapper:** Included in repository
+
+### Building the Project
+
+1. **Generate Assets & Data:**
+   Always execute the DataGen pipeline first. This ensures all required block models, recipes, and blockstates are properly compiled.
+   ```bash
+   ./gradlew runData
+   ```
+
+2. **Compile the Mod JAR:**
+   Once DataGen completes, run the standard build process:
+   ```bash
+   ./gradlew build
+   ```
+
+3. **Locate the Output:**
+   The compiled JAR file will be available in the output directory:
+   ```text
+   build/libs/ChippedExtras-1.18.2-*.jar
+   ```
+
+---
+
+## 📜 License & Acknowledgments
+
+This project is an unofficial backport maintained under open-source licenses.
 
 * **License:** Distributed under the [Eclipse Public License - v 2.0](LICENSE).
-* **Source Code:** Available on [GitHub](https://github.com/xalbino/ChippedExtras/).
-* **Original Author:** [puredoom](https://github.com/puredoom) (Original creator of Chipped Extras).
-* **Base Mod:** [Chipped](https://www.curseforge.com/minecraft/mc-mods/chipped) by the **Terrarium Team**. All referenced textures and base assets belong to their respective creators under the Terrarium License v1.
+* **Source Repository:** Hosted on [GitHub](https://github.com/xalbino/ChippedExtras/).
+* **Original Author:** [puredoom](https://github.com/puredoom) — Creator of the original *Chipped Extras* mod.
+* **Base Mod Credits:** [Chipped](https://www.curseforge.com/minecraft/mc-mods/chipped) created by the **Terrarium Team**. All referenced textures and core assets remain the property of their respective creators under the *Terrarium License v1*.
+
+---
+
+<p center>
+  <i>Not an official Minecraft product. Not approved by or associated with Mojang or Microsoft.</i>
+</p>
